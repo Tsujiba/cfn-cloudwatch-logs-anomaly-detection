@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudWatch Logs Anomaly Detector
+
+Parameters:
+  DetectorName:
+    Type: String
+    Default: cwlog-anomaly-detector-1
+    Description: The name of the detector.
+  EvaluationFrequency:
+    Type: String
+    Default: FIVE_MIN
+    AllowedValues:
+      - FIVE_MIN
+      - TEN_MIN
+      - FIFTEEN_MIN
+      - THIRTY_MIN
+      - ONE_HOUR
+    Description: The evaluation frequency of the detector.
+  AnomalyVisibilityTime:
+    Type: Number
+    Default: 21
+    Description: The visibility time for anomalies.
+    MinValue: 0
+    MaxValue: 43200
+  LogGroupName:
+    Type: String
+    Default: /aws/lambda/lambda-log-test
+    Description: The CloudWatch Logs log group name.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: CloudWatch Logs Anomaly Detector
+        Parameters:
+          - LogGroupName
+
+Resources:
+  CWLogAnomalyDetector:
+    Type: AWS::Logs::LogAnomalyDetector
+    Properties:
+      DetectorName: !Ref DetectorName
+      AnomalyVisibilityTime: !Ref AnomalyVisibilityTime
+      EvaluationFrequency: !Ref EvaluationFrequency
+      LogGroupArnList:
+        - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${LogGroupName}
